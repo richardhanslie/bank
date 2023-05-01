@@ -1,6 +1,7 @@
 package id.co.miniproject.bank.controller;
 
 import id.co.miniproject.bank.entity.Bank;
+import id.co.miniproject.bank.model.BankData;
 import id.co.miniproject.bank.model.BankInfo;
 import id.co.miniproject.bank.service.BankService;
 import id.co.miniproject.bank.util.ErrorCode;
@@ -53,6 +54,15 @@ public class BankController {
     @PutMapping()
     private ResponseEntity<Object> updateBank(@Validated @RequestBody Bank bank) {
         Bank newBank = bankService.updateBankData(bank);
+        if (StringUtils.isEmpty(newBank)) {
+            return responseUtils.generate(ErrorCode.General_Error, HttpStatus.BAD_REQUEST, null);
+        }
+        return responseUtils.generate(ErrorCode.Success, HttpStatus.ACCEPTED, newBank);
+    }
+
+    @PostMapping("/saldo")
+    private ResponseEntity<Object> updateBankByKtp(@RequestBody BankData bank) {
+        Bank newBank = bankService.updateDataByKtp(bank);
         if (StringUtils.isEmpty(newBank)) {
             return responseUtils.generate(ErrorCode.General_Error, HttpStatus.BAD_REQUEST, null);
         }

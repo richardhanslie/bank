@@ -1,8 +1,10 @@
 package id.co.miniproject.bank.service;
 
 import id.co.miniproject.bank.entity.Bank;
+import id.co.miniproject.bank.model.BankData;
 import id.co.miniproject.bank.model.BankInfo;
 import id.co.miniproject.bank.repository.BankRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -58,6 +60,15 @@ public class BankService {
             return bankInfo;
         }catch (Exception e){
             throw new RuntimeException("Failed Get Bank with nomor KTP: " + nomorKtp);
+        }
+    }
+
+    @Transactional
+    public Bank updateDataByKtp(BankData bankData) {
+        try {
+            return repo.updateBankByNomorKtp(bankData.getSaldo(), bankData.getNomorktp());
+        } catch (Exception e) {
+            throw new RuntimeException("Update Bank Data Failed, Try Again");
         }
     }
 }

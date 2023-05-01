@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface BankRepo extends JpaRepository<Bank, Integer> {
     @Query(value = "SELECT * FROM bank WHERE nomor_ktp = :nomorKtp", nativeQuery = true)
     Bank getBankByNomorKtp(@Param("nomorKtp") String nomorKtp);
+
+    @Query(value = "UPDATE bank saldo = :saldo WHERE nomor_ktp = :nomorKtp", nativeQuery = true)
+    Bank updateBankByNomorKtp(@Param("saldo") int saldo, @Param("nomorKtp") String nomorKtp);
 }
