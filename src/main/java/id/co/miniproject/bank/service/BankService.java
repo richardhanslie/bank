@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,9 @@ public class BankService {
     }
 
     public Bank addNewBank(Bank Bank) {
+        Bank newBank = new Bank();
+        //generate 16 digit random number dengan awalan 52
+        Bank.setNomor_rekening(generateRandom(52));
         try {
             return repo.save(Bank);
         } catch (Exception e) {
@@ -48,9 +52,9 @@ public class BankService {
         }
     }
 
-    public BankInfo getBankByNomorKtp(String nomorKtp) {
+    public BankInfo getBankByRekening(String nomorRekening) {
         try {
-            Bank bank = repo.getBankByNomorKtp(nomorKtp);
+            Bank bank = repo.getBankByNomorRekening(nomorRekening);
             BankInfo bankInfo = new BankInfo();
 
             if(!ObjectUtils.isEmpty(bank)){
@@ -59,16 +63,53 @@ public class BankService {
             }
             return bankInfo;
         }catch (Exception e){
-            throw new RuntimeException("Failed Get Bank with nomor KTP: " + nomorKtp);
+            throw new RuntimeException("Failed Get Bank with nomor KTP: " + nomorRekening);
         }
     }
 
-    @Transactional
-    public Bank updateDataByKtp(BankData bankData) {
+    public static String generateRandom(int prefix) {
+        Random rand = new Random();
+
+        long x = (long)(rand.nextDouble()*100000000000000L);
+
+        String s = String.valueOf(prefix) + String.format("%014d", x);
+        return s;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public Boolean transfer(BankData bankData) {
         try {
-            return repo.updateBankByNomorKtp(bankData.getSaldo(), bankData.getNomorktp());
+            Bank bankPengirim = repo.getBankByNomorRekening(bankData.getNomorRekeningPengirim());
+            Bank bankPenerima = repo.getBankByNomorRekening(bankData.getNomorRekeningPenerima());
+
+            bankPengirim = repo.updateBankByNomorRekening(bankPengirim.getSaldo() - bankData.getHarga()
+                    , bankData.getNomorRekeningPengirim());
+            bankPenerima = repo.updateBankByNomorRekening(bankPenerima.getSaldo() + bankData.getHarga()
+                    , bankData.getNomorRekeningPenerima());
+
+            if(bankPenerima.getSaldo() == bankPenerima.getSaldo() + bankData.getHarga() &&
+                    bankPengirim.getSaldo() == bankPengirim.getSaldo() - bankData.getHarga()){
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             throw new RuntimeException("Update Bank Data Failed, Try Again");
+        }
+    }
+
+    public BankInfo getBankByNomorKtp(String nomorKtp) {
+        try {
+            Bank bank = repo.getBankByNomorKtp(nomorKtp);
+            BankInfo bankInfo = new BankInfo();
+
+            if(!ObjectUtils.isEmpty(bank)){
+                bankInfo.setNama_customer(bank.getNama_customer());
+                bankInfo.setSaldo(bank.getSaldo());
+                bankInfo.setNomor_rekening(bank.getNomor_rekening());
+            }
+            return bankInfo;
+        }catch (Exception e){
+            throw new RuntimeException("Failed Get Bank with nomor KTP: " + nomorKtp);
         }
     }
 }

@@ -20,6 +20,8 @@ public class Bank {
     @NotNull(message = "[saldo] cannot be blank")
     private int saldo;
 
+    private String nomor_rekening;
+
     @NotBlank(message = "[nomor_ktp] cannot be blank")
     @Size(min = 16)
     private String nomor_ktp;

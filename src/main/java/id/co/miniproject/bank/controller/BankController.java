@@ -60,13 +60,13 @@ public class BankController {
         return responseUtils.generate(ErrorCode.Success, HttpStatus.ACCEPTED, newBank);
     }
 
-    @PostMapping("/saldo")
-    private ResponseEntity<Object> updateBankByKtp(@RequestBody BankData bank) {
-        Bank newBank = bankService.updateDataByKtp(bank);
-        if (StringUtils.isEmpty(newBank)) {
+    @PostMapping("/transfer")
+    private ResponseEntity<Object> transfer(@RequestBody BankData bank) {
+        Boolean res = bankService.transfer(bank);
+        if (Boolean.FALSE.equals(res)) {
             return responseUtils.generate(ErrorCode.General_Error, HttpStatus.BAD_REQUEST, null);
         }
-        return responseUtils.generate(ErrorCode.Success, HttpStatus.ACCEPTED, newBank);
+        return responseUtils.generate(ErrorCode.Success, HttpStatus.ACCEPTED, Boolean.TRUE);
     }
 
     @GetMapping("/info/{nomorKtp}")
