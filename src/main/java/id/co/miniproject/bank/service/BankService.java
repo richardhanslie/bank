@@ -82,16 +82,16 @@ public class BankService {
             Bank bankPengirim = repo.getBankByNomorRekening(bankData.getNomorRekeningPengirim());
             Bank bankPenerima = repo.getBankByNomorRekening(bankData.getNomorRekeningPenerima());
 
-            bankPengirim = repo.updateBankByNomorRekening(bankPengirim.getSaldo() - bankData.getHarga()
+            System.out.println("Saldo bank pengirim: " + bankPengirim.getSaldo());
+            System.out.println("Harga: " + bankData.getHarga());
+            System.out.println("No Rek Pengirim: " + bankData.getNomorRekeningPengirim());
+            repo.updateBankByNomorRekening(bankPengirim.getSaldo() - bankData.getHarga()
                     , bankData.getNomorRekeningPengirim());
-            bankPenerima = repo.updateBankByNomorRekening(bankPenerima.getSaldo() + bankData.getHarga()
+
+            repo.updateBankByNomorRekening(bankPenerima.getSaldo() + bankData.getHarga()
                     , bankData.getNomorRekeningPenerima());
 
-            if(bankPenerima.getSaldo() == bankPenerima.getSaldo() + bankData.getHarga() &&
-                    bankPengirim.getSaldo() == bankPengirim.getSaldo() - bankData.getHarga()){
-                return true;
-            }
-            return false;
+            return true;
         } catch (Exception e) {
             throw new RuntimeException("Update Bank Data Failed, Try Again");
         }
